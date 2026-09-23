@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undangan Minnie & Mikky</title>
+    
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Undangan Pernikahan Minnie & Mikky">
+    <meta property="og:description" content="Tanpa Mengurangi Rasa Hormat, Kami Mengundang Bapak/Ibu/Saudara/i untuk Hadir di Acara Pernikahan Kami.">
+    <meta property="og:image" content="https://java-emerald.netlify.app/cover.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://java-emerald.netlify.app/">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Background luar (pembungkus utama di laptop) */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #121212; /* Warna latar belakang luar jika dibuka di laptop */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Container Cover Responsif (Rasio HP) */
+        .cover-container {
+            width: 100%;
+            max-width: 480px; /* Batas lebar tampilan di laptop biar ga melar */
+            height: 100vh;
+            background: url('cover.jpg') center center / cover no-repeat;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 130px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Bayangan estetik di laptop */
+        }
+
+        /* Area Nama Tamu & Tombol Buka */
+        .interactive-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 70%; /* Lebar kotak mengikuti persentase layar */
+        max-width: 220px; /* Batas lebar maksimal di laptop */
+        padding: 16px 14px; /* Jarak ruang di dalam kotak */
+    
+        /* Styling Kotak Cokelat */
+        background-color: #a08253; /* Kode warna cokelat (sesuaikan jika perlu) */
+        border-radius: 30px; /* Lengkungan sudut kotak */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Efek bayangan halus */
+}
+
+        .dear-text {
+            font-size: 0.85rem;
+            color: #ffffff;
+            opacity: 0.8;
+        }
+
+        .guest-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-top: -8px;
+        }
+
+        .btn-open {
+            background-color: #9e1b11;
+            color: #ffffff;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .btn-open:active {
+            transform: scale(0.95);
+        }
+
+        /* TOMBOL MUSIK MELAYANG POJOK KANAN BAWAH */
+        .music-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 42px;
+            height: 42px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            transition: transform 0.2s ease;
+        }
+
+        .music-btn:active {
+            transform: scale(0.9);
+        }
+
+        .music-btn img {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cover-container">
+        <div class="interactive-area">
+            <p class="dear-text">Dear,</p>
+            <h2 id="guestName" class="guest-name">Nama Tamu</h2>
+            <button id="openBtn" class="btn-open">Buka Undangan</button>
+        </div>
+    </div>
+
+    <!-- Tombol Kontrol Musik Melayang -->
+    <button id="musicBtn" class="music-btn" title="Toggle Music">
+        <img id="musicIcon" src="https://cdn-icons-png.flaticon.com/512/461/461238.png" alt="Music Icon">
+    </button>
+
+    <!-- File Audio Lokal -->
+    <audio id="myAudio" loop preload="auto">
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // 1. Parameter Nama Tamu (?to=Nama+Tamu)
+        const urlParams = new URLSearchParams(window.location.search);
+        const namaTamu = urlParams.get('to');
+        if (namaTamu) {
+            document.getElementById('guestName').textContent = namaTamu;
+        }
+
+        const music = document.getElementById("myAudio");
+        const openBtn = document.getElementById("openBtn");
+        const musicBtn = document.getElementById("musicBtn");
+        const musicIcon = document.getElementById("musicIcon");
+
+        let isPlaying = false;
+
+        // URL Ikon Play & Mute
+        const iconPlay = "https://cdn-icons-png.flaticon.com/512/461/461238.png";
+        const iconMute = "https://cdn-icons-png.flaticon.com/512/727/727269.png";
+
+        // Fungsi Play/Pause Musik
+        function toggleMusic() {
+            if (isPlaying) {
+                music.pause();
+                musicIcon.src = iconMute;
+                isPlaying = false;
+            } else {
+                music.play().then(() => {
+                    musicIcon.src = iconPlay;
+                    isPlaying = true;
+                }).catch(err => console.log("Audio play error:", err));
+            }
+        }
+
+        // Event Klik Tombol Musik Melayang
+        musicBtn.addEventListener("click", toggleMusic);
+
+        // Event Klik Buka Undangan
+        openBtn.addEventListener("click", () => {
+            if (!isPlaying) {
+                music.play().then(() => {
+                    musicIcon.src = iconPlay;
+                    isPlaying = true;
+                }).catch(err => console.log("Audio error:", err));
+            }
+
+            setTimeout(() => {
+    window.open("https://fadilmuhammad.my.canva.site/javaemeraldwedding", "_blank");
+}, 300);
+        });
+    </script>
+</body>
+</html>
